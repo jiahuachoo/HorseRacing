@@ -31,6 +31,13 @@ namespace BetEasy.HorseRacingMarketConsole.Models
             this.Selections = new List<WolferhamptonRawMarketSelection>();
         }
         public List<WolferhamptonRawMarketSelection> Selections { get; set; }
+
+        public WolferhamptonRawMarketTag Tags { get; set; }
+    }
+
+    public class WolferhamptonRawMarketTag
+    {
+        public string type {get; set;}
     }
 
     public class WolferhamptonRawMarketSelection

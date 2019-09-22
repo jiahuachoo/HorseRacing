@@ -7,13 +7,17 @@ namespace BetEasy.HorseRacingMarketConsole.Models
     {
         public RacingOdds(
             string horseName, 
-            decimal price)
+            decimal price,
+            string oddType="fixed")
         {
+            this.OddType = oddType;
             this.HorseName = horseName;
             this.Price = price;
         }
         
         public string HorseName { get; private set; }
+
+        public string OddType { get; private set; }
 
         public decimal Price { get; private set; }
 
@@ -21,6 +25,7 @@ namespace BetEasy.HorseRacingMarketConsole.Models
         {
             return 
                 string.Compare(this.HorseName, other.HorseName, false, CultureInfo.InvariantCulture) == 0
+                && string.Compare(this.OddType, other.OddType, false, CultureInfo.InvariantCulture) == 0
                 && this.Price == other.Price;
         }
     }

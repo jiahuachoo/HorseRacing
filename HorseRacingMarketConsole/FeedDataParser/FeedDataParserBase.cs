@@ -4,6 +4,7 @@ using System.Globalization;
 using Microsoft.Extensions.Logging;
 using BetEasy.HorseRacingMarketConsole.Models;
 using System;
+using System.Collections.Generic;
 
 namespace BetEasy.HorseRacingMarketConsole.FeedDataParser
 {
@@ -22,13 +23,14 @@ namespace BetEasy.HorseRacingMarketConsole.FeedDataParser
             this.logger = logger;
         }
 
-        public async Task<RacingFixture> Parse(string feedDataFile)
+        public async Task<List<RacingFixture>> Parse(string feedDataFile)
         {
-
+            var fixtureList = new List<RacingFixture>();
+            
             if(!File.Exists(feedDataFile))
             {
                 this.logger.LogError($"Unable to parse {feedDataFile} because it was not found.");
-                return null;
+                return fixtureList;
             }
 
             if(string.Compare(
@@ -38,20 +40,21 @@ namespace BetEasy.HorseRacingMarketConsole.FeedDataParser
                 CultureInfo.InvariantCulture) != 0)
             {
                 this.logger.LogError($"Unable to parse {feedDataFile} because it was in an unexpected format.");
-                return null;
+                return fixtureList;
             }
 
             try
             {
-                return await this.OnParse(feedDataFile);
+                fixtureList = await this.OnParse(feedDataFile);
             }
             catch(Exception e)
             {
                 this.logger.LogError(e, $"Unable to parse {feedDataFile}");
             }
-            return null;
+
+            return fixtureList;
         }
 
-        protected abstract Task<RacingFixture> OnParse(string feedDataFile);
+        protected abstract Task<List<RacingFixture>> OnParse(string feedDataFile);
     }
 }

@@ -3,12 +3,12 @@ using BetEasy.HorseRacingMarketConsole.Models;
 
 namespace BetEasy.HorseRacingMarketConsole.Test
 {
-    public class FeedParserTestData
+    public class ConsolePrinterTestModel
     {
-        public string FeedDataFile { get; set; }
+        public List<RacingFixture> StubFixtures { get; set; }
 
-        public List<RacingFixture> ExpectedData { get; set; }
-
+        public List<string> ExpectedOutput { get; set;}
+        
         public string TestCaseName { get; set; }
     }
 }

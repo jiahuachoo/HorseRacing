@@ -1,27 +1,44 @@
 ﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using CommandLine;
+using BetEasy.HorseRacingMarketConsole.FeedDataParser;
 
 namespace BetEasy.HorseRacingMarketConsole
 {
     class Program
     {
-        private static void Startup()
+        private static ServiceProvider ConfigureServices()
         {
             var serviceCollection = new ServiceCollection();
-            ConfigureServices(serviceCollection);
+            serviceCollection.AddLogging(configure => configure.AddConsole())                    
+                    .Configure<LoggerFilterOptions>(options => options.MinLevel = LogLevel.Information); 
+            
+            serviceCollection.AddTransient<ICaulfieldFeedParser, CaulfieldFeedParser>();
+            serviceCollection.AddTransient<IWolferhamptonFeedParser, WolferhamptonFeedParser>();
+            serviceCollection.AddTransient<IFeedParserFactory, FeedParserFactory>();
+            serviceCollection.AddTransient<IConsoleWrapper, ConsoleWrapper>();
+            serviceCollection.AddTransient<IConsolePrinter, ConsolePrinter>();
+
+            return serviceCollection.BuildServiceProvider();
         }
 
-        private static void ConfigureServices(IServiceCollection services)
+        static async Task Main(string[] args)
         {
-            services.AddLogging(configure => configure.AddConsole())                    
-                    .Configure<LoggerFilterOptions>(options => options.MinLevel = LogLevel.Information);                  
-        }
+            var serviceProvider = ConfigureServices();
+            var printer = serviceProvider.GetService<IConsolePrinter>();
 
-        static void Main(string[] args)
-        {
-            Startup();
-            Console.WriteLine("Hello World!");
+            var result = Parser.Default.ParseArguments<ConsoleOptions>(args);
+            await result.MapResult(async 
+                opt =>
+                    {                       
+                        await printer.Print(opt.FeedSource, opt.FeedFile);
+                    },
+                errors => Task.FromResult(0)
+            );
+               
         }
     }
 }
